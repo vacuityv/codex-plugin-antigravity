@@ -1,0 +1,5 @@
+{
+  "name": "codex",
+  "version": "0.1.0",
+  "description": "Use OpenAI Codex from inside Google Antigravity to review code or delegate tasks."
+}

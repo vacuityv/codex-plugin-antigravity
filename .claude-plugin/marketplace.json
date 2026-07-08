@@ -1,0 +1,18 @@
+{
+  "name": "codex-antigravity",
+  "owner": {
+    "name": "codex-plugin-antigravity"
+  },
+  "metadata": {
+    "description": "Use OpenAI Codex from inside Google Antigravity for code review and task delegation.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "codex",
+      "description": "Call Codex from Antigravity to review code or delegate coding tasks.",
+      "version": "0.1.0",
+      "source": "./plugins/codex"
+    }
+  ]
+}
