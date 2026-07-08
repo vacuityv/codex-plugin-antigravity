@@ -114,7 +114,7 @@ function cmdSetup(tokens) {
   if (version.available) {
     lines.push(`- Auth: ${report.loggedIn ? `✅ ${report.authDetail}` : "❌ not authenticated"}`);
   }
-  lines.push(`- Ready: ${report.ready ? "✅ yes — `/codex:review` and `/codex:rescue` are good to go" : "⚠️ not yet"}`);
+  lines.push(`- Ready: ${report.ready ? "✅ yes — Codex review and task delegation are good to go" : "⚠️ not yet"}`);
   if (report.fix) {
     lines.push(`\n**Next step:** ${report.fix}`);
   }

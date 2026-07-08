@@ -1,9 +1,5 @@
 {
   "name": "codex",
   "version": "0.1.0",
-  "description": "Use OpenAI Codex from inside Google Antigravity to review code or delegate tasks. Adds /codex:review, /codex:adversarial-review, /codex:rescue, /codex:setup, /codex:status, /codex:result and /codex:cancel — the Antigravity (agy / Gemini) agent shells out to the local `codex` CLI (`codex exec`).",
-  "skills": [
-    "skills/codex-cli-runtime/SKILL.md",
-    "skills/gpt-5-prompting/SKILL.md"
-  ]
+  "description": "Use OpenAI Codex from inside Google Antigravity. Adds a `codex` skill so the Antigravity agent can shell out to the local `codex` CLI (`codex exec`) for read-only code review and task delegation, plus a background-job runner (status / result / cancel)."
 }
