@@ -24,7 +24,15 @@ The `codex` skill activates, and the Antigravity agent runs the bundled Node run
 | “Delegate this to Codex” / “ask Codex to fix X” | `codex exec` (read-only; `--write` to edit) |
 | “How’s the Codex job?” / “show the result” / “cancel it” | background job `status` / `result` / `cancel` |
 
-Long runs go to the background and are tracked on disk, so you can check `status` / `result` later.
+## Performance & background jobs
+
+Codex is a real autonomous agent, so a non-trivial task (generating files, a refactor, anything with `--write`) legitimately takes **1–3 minutes** — that is Codex working, not the plugin hanging.
+
+- The runner uses `codex exec` (non-interactive) with a `-s` sandbox, so **Codex never pauses for an approval prompt and never waits on stdin**. A foreground run that looks "stuck" is just Codex still thinking. You do **not** need `--dangerously-bypass-approvals-and-sandbox` (the plugin deliberately avoids it — `-s workspace-write` is the safer path and is enough to write files).
+- **A foreground run blocks the terminal** until Codex finishes. That's fine for quick read-only questions.
+- For **`--write` or long / multi-step work, use the background mode**: the runner returns a job ID immediately, then you check `status` and fetch `result`. In Antigravity, just say *"…in the background"* (e.g. "generate the dashboard with Codex in the background"), and the `codex` skill runs it detached and reports the job ID.
+
+Background jobs are tracked on disk under `${CODEX_HOME:-~/.codex}/antigravity-plugin/jobs/`, so `status` / `result` / `cancel` keep working across separate calls and restarts.
 
 ## Requirements
 
