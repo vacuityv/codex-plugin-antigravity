@@ -53,7 +53,21 @@ node "$RUNNER" <command> [args…]
   ```
   Add `--write` only if the user wants Codex to actually edit files
   (`workspace-write` sandbox); otherwise it stays read-only. Add `--resume-last`
-  to continue Codex's previous session, `--background` for long work.
+  to continue Codex's previous session.
+
+  **Foreground vs background — this matters for UX.** Codex is a real agent and a
+  non-trivial task (generating files, a refactor, writing tests, anything with
+  `--write`) legitimately takes 1–3 minutes. A foreground run **blocks the
+  terminal** for that whole time. So:
+  - Quick, read-only questions → run foreground.
+  - Anything with `--write`, or clearly multi-step / long work → add
+    `--background`. The runner returns a **job ID immediately**; then poll
+    `node "$RUNNER" status <id>` and fetch `node "$RUNNER" result <id>`. Do NOT
+    sit blocking on a foreground call for a long task.
+
+  Note: the runner uses `codex exec` (non-interactive) with a `-s` sandbox, so
+  Codex never pauses for an approval prompt and never waits on stdin — a
+  foreground run that seems "stuck" is just Codex still working, not hung.
 
 ## Rules
 
