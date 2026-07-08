@@ -43,25 +43,37 @@ Background jobs are tracked on disk under `${CODEX_HOME:-~/.codex}/antigravity-p
 
 ## Install
 
-Copy the `codex` plugin folder into one of Antigravity's plugin locations, then reload/restart Antigravity.
+Copy the `codex` plugin folder into a plugin location, then reload/restart Antigravity. **The path depends on which surface you use** — they are not the same:
 
-**Global — active in every workspace** (recommended):
+| Surface | Scope | Plugin directory | Status |
+|---|---|---|---|
+| **Antigravity 2.0 app / IDE** | Global (all workspaces) | `~/.gemini/config/plugins/codex/` | ✅ official + verified working |
+| **`agy` CLI** | Global (all workspaces) | `~/.gemini/antigravity-cli/plugins/codex/` | ⚠️ inferred from the CLI's config base (`~/.gemini/antigravity-cli/`); verify with `/skills` |
+| Any surface | Per-workspace | `<workspace>/.agents/plugins/codex/` (or `_agents/plugins/`) | ✅ official |
 
+The app/IDE and the `agy` CLI keep their configuration under **different base directories** — `~/.gemini/config/` for the app, `~/.gemini/antigravity-cli/` for the CLI — so their global plugin paths differ. The per-workspace `.agents/plugins/` path is shared by all surfaces.
+
+**Antigravity 2.0 app / IDE (global):**
 ```bash
 mkdir -p ~/.gemini/config/plugins
 cp -r plugins/codex ~/.gemini/config/plugins/codex
 ```
 
-**Per-workspace — only in that project** (`.agents/` or `_agents/` at the workspace root):
+**`agy` CLI (global):**
+```bash
+mkdir -p ~/.gemini/antigravity-cli/plugins
+cp -r plugins/codex ~/.gemini/antigravity-cli/plugins/codex
+```
 
+**Per-workspace (any surface):**
 ```bash
 mkdir -p .agents/plugins
 cp -r plugins/codex .agents/plugins/codex
 ```
 
-Then in Antigravity, confirm the skill loaded with `/skills` (you should see `codex`), and run the setup check by asking: **“check if Codex is set up.”** If Codex is installed but not logged in, run `codex login` in a terminal.
+Then restart Antigravity, confirm the skill loaded with `/skills` (you should see `codex`), and run the setup check by asking: **“check if Codex is set up.”** If Codex is installed but not logged in, run `codex login` in a terminal.
 
-> The `~/.gemini/antigravity-cli/plugins/` path some third-party guides mention only applies to the **`agy` CLI** after you install and run it — it is not where the IDE/app looks. The IDE/app use `~/.gemini/config/plugins/` (global) and `.agents/plugins/` (workspace).
+> If `/skills` doesn't show `codex` after a global install, fall back to the per-workspace `.agents/plugins/codex/` path — that one is confirmed for every surface.
 
 ## Using it from the `agy` CLI or Claude Code (optional)
 
