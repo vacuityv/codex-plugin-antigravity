@@ -6,13 +6,20 @@ Same idea as [`openai/codex-plugin-cc`](https://github.com/openai/codex-plugin-c
 
 ## How it works in Antigravity
 
-Per the [official plugin docs](https://antigravity.google/docs/plugins), an Antigravity plugin bundles **skills, rules, MCP servers, and hooks** — it does **not** provide custom slash commands or subagents. So the interface in Antigravity is a **skill**:
+The interface is a **skill**. Whichever surface you use, you drive it in natural language:
 
-> Just tell the agent, in natural language: **“review these changes with Codex”**, **“ask Codex to fix the failing test”**, **“get a second opinion from Codex on this design.”**
+> **“review these changes with Codex”**, **“ask Codex to fix the failing test”**, **“get a second opinion from Codex on this design.”**
 
 The `codex` skill activates, and the Antigravity agent runs the bundled Node runner in the terminal, which drives `codex exec`. Codex's output comes back verbatim.
 
-> The repo also ships Claude-Code-style `commands/` and an `agents/` subagent. Antigravity ignores those, but they let the **`agy` CLI** and **Claude Code** use the same bundle with real `/codex:*` slash commands. In the Antigravity IDE/2.0 app, use natural language instead.
+What each surface loads from the bundle (verified with `agy plugin validate`):
+
+| Surface | skills | agents | commands |
+|---|:--:|:--:|:--:|
+| **`agy` CLI** | ✅ | ✅ | ✅ (converted to skills) |
+| **Antigravity 2.0 app / IDE** | ✅ | ✅ | — |
+
+So on the `agy` CLI you *additionally* get `/codex:*` slash commands (see below); in the 2.0 app / IDE you use natural language, which triggers the same `codex` skill. The same bundle also works in Claude Code.
 
 ## What you can ask for
 
@@ -43,41 +50,50 @@ Background jobs are tracked on disk under `${CODEX_HOME:-~/.codex}/antigravity-p
 
 ## Install
 
-Copy the `codex` plugin folder into a plugin location, then reload/restart Antigravity. **The path depends on which surface you use** — they are not the same:
+First get the bundle:
 
-| Surface | Scope | Plugin directory | Status |
-|---|---|---|---|
-| **Antigravity 2.0 app / IDE** | Global (all workspaces) | `~/.gemini/config/plugins/codex/` | ✅ official + verified working |
-| **`agy` CLI** | Global (all workspaces) | `~/.gemini/antigravity-cli/plugins/codex/` | ⚠️ inferred from the CLI's config base (`~/.gemini/antigravity-cli/`); verify with `/skills` |
-| Any surface | Per-workspace | `<workspace>/.agents/plugins/codex/` (or `_agents/plugins/`) | ✅ official |
+```bash
+git clone https://github.com/vacuityv/codex-plugin-antigravity.git
+cd codex-plugin-antigravity
+```
 
-The app/IDE and the `agy` CLI keep their configuration under **different base directories** — `~/.gemini/config/` for the app, `~/.gemini/antigravity-cli/` for the CLI — so their global plugin paths differ. The per-workspace `.agents/plugins/` path is shared by all surfaces.
+Then install it into whichever Antigravity surface you use.
 
-**Antigravity 2.0 app / IDE (global):**
+### A. `agy` CLI — use the plugin manager (recommended)
+
+```bash
+agy plugin install ./plugins/codex
+agy plugin list          # should show "codex" with components: skills, agents, commands
+```
+
+To update later: `git pull` in this repo, then re-run `agy plugin install ./plugins/codex`. To remove: `agy plugin uninstall codex`.
+
+### B. Antigravity 2.0 app / IDE — copy into the global plugins folder
+
 ```bash
 mkdir -p ~/.gemini/config/plugins
 cp -r plugins/codex ~/.gemini/config/plugins/codex
 ```
 
-**`agy` CLI (global):**
+Restart Antigravity, then run `/skills` — you should see **`codex`**. This makes it active in every workspace.
+
+### C. Single workspace only — copy into the project
+
 ```bash
-mkdir -p ~/.gemini/antigravity-cli/plugins
-cp -r plugins/codex ~/.gemini/antigravity-cli/plugins/codex
+mkdir -p /path/to/your/project/.agents/plugins
+cp -r plugins/codex /path/to/your/project/.agents/plugins/codex
 ```
 
-**Per-workspace (any surface):**
-```bash
-mkdir -p .agents/plugins
-cp -r plugins/codex .agents/plugins/codex
-```
+### Then verify
 
-Then restart Antigravity, confirm the skill loaded with `/skills` (you should see `codex`), and run the setup check by asking: **“check if Codex is set up.”** If Codex is installed but not logged in, run `codex login` in a terminal.
+In Antigravity, run `/skills` (you should see `codex`), then ask: **“check if Codex is set up.”** If Codex is installed but not logged in, run `codex login` in a terminal.
 
-> If `/skills` doesn't show `codex` after a global install, fall back to the per-workspace `.agents/plugins/codex/` path — that one is confirmed for every surface.
+> Prefer a symlink so `git pull` updates the plugin in place (methods B/C):
+> `ln -s "$(pwd)/plugins/codex" ~/.gemini/config/plugins/codex`
 
-## Using it from the `agy` CLI or Claude Code (optional)
+## Slash commands (`agy` CLI / Claude Code)
 
-Because the bundle also carries `commands/` and an `agents/codex-rescue` subagent, in those hosts you additionally get real slash commands:
+On the `agy` CLI and in Claude Code, the bundled `commands/` become real slash commands (the CLI converts them to skills on import):
 
 ```
 /codex:setup
@@ -86,6 +102,8 @@ Because the bundle also carries `commands/` and an `agents/codex-rescue` subagen
 /codex:rescue [--write] [--background] <what codex should do>
 /codex:status | /codex:result | /codex:cancel
 ```
+
+In the Antigravity 2.0 app / IDE, use natural language instead (it triggers the same `codex` skill).
 
 ## Runtime design
 
