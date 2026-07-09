@@ -17,7 +17,9 @@ What each surface loads from the bundle (verified with `agy plugin validate`):
 | Surface | skills | agents | commands |
 |---|:--:|:--:|:--:|
 | **`agy` CLI** | ✅ | ✅ | ✅ (converted to skills) |
-| **Antigravity 2.0 app / IDE** | ✅ | ✅ | — |
+| **Antigravity 2.0 app / IDE** | ✅ | — | — |
+
+(agy CLI row verified with `agy plugin validate`; the app row reflects the official 2.0 plugin docs, which list plugin components as skills / rules / mcp / hooks — the app is driven by the `codex` skill either way.)
 
 So on the `agy` CLI you *additionally* get `/codex:*` slash commands (see below); in the 2.0 app / IDE you use natural language, which triggers the same `codex` skill. The same bundle also works in Claude Code.
 
